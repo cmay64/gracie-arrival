@@ -1,1 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gracie's Arrival - Ocean Baby Predictions</title>
+  <style>
+    :root { --pink:#FF69B4; --pink2:#FFB6C1; --blue:#4A90E2; --ink:#2C5F7C; }
+    *{box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:24px;min-height:100vh;overflow-x:hidden;
+         background:linear-gradient(180deg,#FFE4E1 0%,#87CEEB 30%,#98D8E8 70%,#B0E0E6 100%);} 
+    .container{max-width:900px;margin:0 auto;position:relative;z-index:1}
+    h1{margin:0 0 6px;text-align:center;font-size:2.4rem;background:linear-gradient(135deg,var(--pink),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .subtitle{text-align:center;color:var(--pink);margin-bottom:18px}
+    .card{background:rgba(255,255,255,.95);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid rgba(255,182,193,.25);box-shadow:0 8px 26px rgba(255,105,180,.12)}
+    .countdown{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;padding:18px;border-radius:12px;border:2px solid rgba(255,182,193,.4);
+               background:linear-gradient(135deg,rgba(255,182,193,.22),rgba(74,144,226,.12));color:var(--blue);font-weight:700}
+    .countdown small{color:var(--pink);font-weight:600}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;margin-bottom:6px;color:var(--pink);font-weight:600}
+    input,select{width:100%;padding:12px;border:2px solid var(--pink2);border-radius:10px;font-size:16px;background:#fff}
+    input:focus,select:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,105,180,.12)}
+    .slider-container{margin:18px 0}
+    .slider-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .slider-value{padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-weight:700}
+    input[type=range]{width:100%;height:8px;border-radius:8px;background:linear-gradient(90deg,var(--pink2),var(--pink));outline:none;-webkit-appearance:none}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--pink);cursor:pointer}
+    input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--pink);cursor:pointer}
+    button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;font-weight:800;font-size:17px;cursor:pointer}
+    .prediction-item{background:linear-gradient(135deg,rgba(255,182,193,.15),rgba(255,255,255,.92));padding:16px;border-left:4px solid var(--pink);border-radius:12px;margin-bottom:12px}
+    .prediction-name{font-weight:700;color:var(--ink)}
+    .prediction-actions{display:flex;gap:8px;margin-top:8px}
+    .action{padding:6px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+    .action.edit{background:#fff;border:2px solid #7cb342;color:#2e7d32}
+    .action.delete{background:#fff;border:2px solid #e57373;color:#c62828}
+    .leaderboard-tabs{display:none;justify-content:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .tab-button{padding:8px 16px;border-radius:999px;border:2px solid var(--pink2);background:rgba(255,182,193,.3);color:var(--pink);font-weight:700;cursor:pointer}
+    .tab-button.active{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff}
+    .admin{display:none}
+    .admin-link{display:block;text-align:center;margin:8px 0 0;color:#c2185b;font-weight:700;cursor:pointer}
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:10}
+    .modal{background:#fff;border-radius:14px;padding:20px;max-width:360px;width:92%;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+    .modal h3{margin:0 0 10px;color:var(--ink)}
+    .modal .row{margin:10px 0}
+    .modal input{width:100%}
+    .modal .buttons{display:flex;gap:8px;margin-top:12px}
+    .btn{padding:10px 12px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff}
+    .btn.ghost{background:#fff;border:2px solid var(--pink2);color:var(--pink)}
+    @media (max-width:640px){.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌊 Gracie Lanier's Arrival 🐚</h1>
+    <div class="subtitle">Make your predictions!</div>
 
+    <div class="countdown" aria-live="polite">
+      <small>⏰ Countdown to Due Date (September 25th)</small>
+      <div id="countdown">Calculating…</div>
+    </div>
+
+    <div class="card">
+      <h2 style="text-align:center;color:var(--pink);margin-top:0">🏝️ Make Your Prediction</h2>
+      <form id="predictionForm" autocomplete="off">
+        <div class="form-row">
+          <div>
+            <label for="name">Your Name</label>
+            <input id="name" required placeholder="Enter your name" />
+          </div>
+          <div>
+            <label for="relationship">Relationship to Gracie</label>
+            <select id="relationship" required>
+              <option value="">Select relationship</option>
+              <option>Mom</option><option>Dad</option><option>Grandmother</option><option>Grandfather</option>
+              <option>Great Grandmother</option><option>Great Grandfather</option>
+              <option>Aunt</option><option>Uncle</option><option>Cousin</option><option>Friend</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="date">Birth Date</label>
+            <input type="date" id="date" required />
+          </div>
+          <div>
+            <label for="time">Birth Time</label>
+            <input type="time" id="time" required />
+          </div>
+        </div>
+        <div class="slider-container">
+          <div class="slider-top"><span style="color:var(--pink);font-weight:700">Weight Prediction</span><span class="slider-value" id="weightValue">7 lbs 8 oz</span></div>
+          <input type="range" id="weight" min="64" max="176" value="120" step="1" />
+        </div>
+        <div class="slider-container">
+          <div class="slider-top"><span style="color:var(--pink);font-weight:700">Length Prediction</span><span class="slider-value" id="lengthValue">20.0 inches</span></div>
+          <input type="range" id="length" min="14" max="26" value="20" step="0.25" />
+        </div>
+        <button type="submit">🌺 Submit Prediction 🌺</button>
+      </form>
+    </div>
+
+    <div class="card" id="boardContainer">
+      <div style="text-align:center">
+        <div style="font-size:1.6rem;background:linear-gradient(135deg,var(--pink),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🏖️ Prediction Board</div>
+        <div id="boardMode" style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-weight:700">Waiting for Gracie</div>
+        <div class="admin-link" id="openAdmin">🔐 Enter admin PIN</div>
+      </div>
+      <div class="leaderboard-tabs" id="leaderboardTabs">
+        <button class="tab-button active" onclick="showTab('overall', this)">Overall</button>
+        <button class="tab-button" onclick="showTab('date', this)">Best Date</button>
+        <button class="tab-button" onclick="showTab('time', this)">Best Time</button>
+        <button class="tab-button" onclick="showTab('weight', this)">Best Weight</button>
+        <button class="tab-button" onclick="showTab('length', this)">Best Length</button>
+      </div>
+      <div id="predictions"></div>
+    </div>
+
+    <div class="card admin" id="adminSection">
+      <h3 style="text-align:center;color:var(--pink);margin-top:0">🎊 Record Actual Birth Details</h3>
+      <div class="form-row">
+        <div>
+          <label>Actual Birth Date</label>
+          <input type="date" id="actualDate" />
+        </div>
+        <div>
+          <label>Actual Birth Time</label>
+          <input type="time" id="actualTime" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Actual Weight (ounces)</label>
+          <input type="number" id="actualWeight" step="0.1" placeholder="e.g., 120 for 7.5 lbs" />
+        </div>
+        <div>
+          <label>Actual Length (inches)</label>
+          <input type="number" id="actualLength" step="0.25" placeholder="e.g., 20.5" />
+        </div>
+      </div>
+      <button onclick="calculateScores()">🏆 Calculate Winners!</button>
+    </div>
+  </div>
+
+  <!-- PIN modal -->
+  <div class="modal-backdrop" id="pinModal">
+    <div class="modal">
+      <h3>Enter Admin PIN</h3>
+      <div class="row">
+        <input id="pinInput" placeholder="Enter PIN" />
+      </div>
+      <div class="buttons">
+        <button class="btn primary" id="pinSubmit">Unlock</button>
+        <button class="btn ghost" id="pinCancel">Cancel</button>
+      </div>
+      <div id="pinMsg" style="color:#c62828;margin-top:6px;display:none">Incorrect PIN</div>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <h3>Edit Prediction</h3>
+      <input type="hidden" id="editId" />
+      <div class="row"><label>Name</label><input id="editName" /></div>
+      <div class="row"><label>Relationship</label><input id="editRel" /></div>
+      <div class="row"><label>Date</label><input type="date" id="editDate" /></div>
+      <div class="row"><label>Time</label><input type="time" id="editTime" /></div>
+      <div class="row"><label>Weight (ounces)</label><input type="number" id="editWeight" step="1" /></div>
+      <div class="row"><label>Length (inches)</label><input type="number" id="editLength" step="0.25" /></div>
+      <div class="buttons">
+        <button class="btn primary" id="editSave">Save</button>
+        <button class="btn ghost" id="editCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------- Storage: Cloud (Firestore) OR localStorage fallback --------
+    function safeParse(k, fb){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch{return fb;} }
+    let predictions = safeParse('gracePredictions', []);
+    let actualDetails = safeParse('graceActualDetails', null);
+    let currentTab = 'overall';
+    let useCloud = false, db = null, isAdmin = false;
+
+    // 👉 To enable cloud sync for the shared link, paste your Firebase project config below.
+    // (Create a free project at console.firebase.google.com, enable Firestore in test mode.)
+    const firebaseConfig = {  // ← fill in to sync across all visitors
+      apiKey: "",
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+    };
+
+    (function initFirebase(){
+      if (!firebaseConfig.apiKey) return; // stay in local mode
+      const s1=document.createElement('script');s1.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+      const s2=document.createElement('script');s2.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js';
+      s2.onload=()=>{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); useCloud=true; attachCloudListeners(); };
+      document.head.appendChild(s1); document.head.appendChild(s2);
+    })();
+
+    function attachCloudListeners(){
+      // Live predictions (include doc IDs for edit/delete)
+      db.collection('gracie_predictions').orderBy('timestamp','desc').onSnapshot(snap=>{
+        predictions = []; snap.forEach(d=> predictions.push({ id:d.id, ...d.data() }));
+        localStorage.setItem('gracePredictions', JSON.stringify(predictions));
+        displayPredictions();
+      });
+      // Actual details
+      db.collection('gracie_meta').doc('actual').onSnapshot(doc=>{
+        actualDetails = doc.exists ? doc.data() : null;
+        localStorage.setItem('graceActualDetails', JSON.stringify(actualDetails));
+        displayPredictions();
+      });
+    }
+
+    // -------- Countdown --------
+    function updateCountdown(){
+      const dueDate = new Date(2025, 8, 25, 12, 0, 0); // Sept=8, local noon
+      const now = new Date();
+      const diff = dueDate - now;
+      const el = document.getElementById('countdown');
+      if (diff>0){
+        const days=Math.floor(diff/86400000);
+        const hours=Math.floor((diff%86400000)/3600000);
+        const minutes=Math.floor((diff%3600000)/60000);
+        el.textContent = `${days} days, ${hours} hours, ${minutes} minutes`;
+      } else { el.textContent = 'Gracie is here! 🎊'; }
+    }
+    updateCountdown(); setInterval(updateCountdown, 1000);
+
+    // -------- Sliders --------
+    const weightEl = document.getElementById('weight');
+    const lengthEl = document.getElementById('length');
+    weightEl.addEventListener('input', ()=>{
+      const v = parseInt(weightEl.value,10); const lb=Math.floor(v/16), oz=v%16;
+      document.getElementById('weightValue').textContent = `${lb} lbs ${oz} oz`;
+    });
+    lengthEl.addEventListener('input', ()=>{
+      const v = parseFloat(lengthEl.value);
+      document.getElementById('lengthValue').textContent = `${v.toFixed(1)} inches`;
+    });
+    weightEl.dispatchEvent(new Event('input')); lengthEl.dispatchEvent(new Event('input'));
+
+    // -------- Admin PIN modal --------
+    const ADMIN_PIN = 'gracie2025'; // change to any secret you like
+    const pinModal = document.getElementById('pinModal');
+    document.getElementById('openAdmin').addEventListener('click', ()=>{ pinModal.style.display='flex'; setTimeout(()=>document.getElementById('pinInput').focus(), 50); });
+    document.getElementById('pinCancel').addEventListener('click', ()=>{ pinModal.style.display='none'; });
+    document.getElementById('pinSubmit').addEventListener('click', ()=>{
+      const pin = document.getElementById('pinInput').value.trim();
+      if (pin === ADMIN_PIN){ isAdmin = true; document.getElementById('adminSection').style.display='block'; pinModal.style.display='none'; displayPredictions(); }
+      else { const msg=document.getElementById('pinMsg'); msg.style.display='block'; setTimeout(()=>msg.style.display='none',1500); }
+    });
+
+    // -------- Submit prediction --------
+    document.getElementById('predictionForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name=document.getElementById('name').value.trim();
+      const relationship=document.getElementById('relationship').value;
+      const date=document.getElementById('date').value; // YYYY-MM-DD
+      const time=document.getElementById('time').value; // HH:MM
+      const weight=parseInt(weightEl.value,10); const length=parseFloat(lengthEl.value);
+      if(!name||!relationship||!date||!time||Number.isNaN(weight)||Number.isNaN(length)) return alert('Please complete all fields.');
+      const id = 'local_'+Date.now().toString(36)+Math.random().toString(36).slice(2);
+      const data={id,name,relationship,date,time,weight,length,timestamp:Date.now()};
+      if (useCloud){ const {id:_, ...payload} = data; db.collection('gracie_predictions').add(payload); } else {
+        predictions.push(data); localStorage.setItem('gracePredictions', JSON.stringify(predictions)); displayPredictions();
+      }
+      e.target.reset(); weightEl.value=120; lengthEl.value=20; weightEl.dispatchEvent(new Event('input')); lengthEl.dispatchEvent(new Event('input'));
+      flashButton(e.submitter);
+    });
+
+    function flashButton(btn){ if(!btn) return; const old=btn.innerHTML; btn.innerHTML='✓ Prediction Saved!'; btn.style.background='linear-gradient(135deg,#00d084,#00a86b)'; setTimeout(()=>{ btn.innerHTML=old; btn.style.background=''; },1500); }
+
+    // -------- Edit/Delete helpers --------
+    function deletePrediction(id){
+      if (!confirm('Delete this entry?')) return;
+      if (useCloud){ db.collection('gracie_predictions').doc(id).delete(); }
+      else{ predictions = predictions.filter(p=>p.id!==id); localStorage.setItem('gracePredictions', JSON.stringify(predictions)); displayPredictions(); }
+    }
+    function openEdit(pred){
+      const m = document.getElementById('editModal');
+      document.getElementById('editId').value = pred.id || pred._id || '';
+      document.getElementById('editName').value = pred.name;
+      document.getElementById('editRel').value = pred.relationship;
+      document.getElementById('editDate').value = pred.date;
+      document.getElementById('editTime').value = pred.time;
+      document.getElementById('editWeight').value = pred.weight;
+      document.getElementById('editLength').value = pred.length;
+      m.style.display = 'flex';
+    }
+    document.getElementById('editCancel').addEventListener('click',()=>{ document.getElementById('editModal').style.display='none'; });
+    document.getElementById('editSave').addEventListener('click',()=>{
+      const id=document.getElementById('editId').value;
+      const updated={
+        name:document.getElementById('editName').value.trim(),
+        relationship:document.getElementById('editRel').value.trim(),
+        date:document.getElementById('editDate').value,
+        time:document.getElementById('editTime').value,
+        weight:parseFloat(document.getElementById('editWeight').value),
+        length:parseFloat(document.getElementById('editLength').value)
+      };
+      if (useCloud){ db.collection('gracie_predictions').doc(id).update(updated); }
+      else{
+        const i = predictions.findIndex(p=>p.id===id);
+        if (i>-1){ predictions[i] = { ...predictions[i], ...updated }; localStorage.setItem('gracePredictions', JSON.stringify(predictions)); displayPredictions(); }
+      }
+      document.getElementById('editModal').style.display='none';
+    });
+
+    // -------- Board rendering & leaderboard --------
+    function showTab(tab, el){ currentTab=tab; document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active')); if(el) el.classList.add('active'); displayPredictions(); }
+
+    function displayPredictions(){
+      const container=document.getElementById('predictions');
+      if (!predictions.length){ container.innerHTML='<div style="text-align:center;color:var(--pink);font-style:italic;padding:24px">No predictions yet. Be the first!</div>'; return; }
+      let list=[...predictions];
+      if (actualDetails){
+        document.getElementById('leaderboardTabs').style.display='flex';
+        document.getElementById('boardMode').textContent='🏆 Leaderboard Mode';
+        if(currentTab==='overall'){ list=list.map(p=>({...p,score:overallScore(p)})).sort((a,b)=>b.score-a.score); }
+        else if(currentTab==='date'){ list=sortByDate(list); }
+        else if(currentTab==='time'){ list=sortByTime(list); }
+        else if(currentTab==='weight'){ list=sortByWeight(list); }
+        else if(currentTab==='length'){ list=sortByLength(list); }
+      } else {
+        document.getElementById('leaderboardTabs').style.display='none';
+        document.getElementById('boardMode').textContent='Waiting for Gracie';
+        list.sort((a,b)=>b.timestamp-a.timestamp);
+      }
+      container.innerHTML = list.map((p,i)=>renderPrediction(p,i)).join('');
+    }
+
+    function renderPrediction(p, idx){
+      const pounds=Math.floor(p.weight/16), ounces=p.weight%16;
+      const isTop = actualDetails && idx===0;
+      const deco = isTop? 'background:linear-gradient(135deg,rgba(255,215,0,.22),#fff);border-left-color:#FFD700' : '';
+      const dateFmt = new Date(p.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const actions = isAdmin ? `<div class="prediction-actions">
+          <button class="action edit" onclick='(function(){window.__edit(${JSON.stringify(p).replace(/"/g,"&quot;")});})()'>Edit</button>
+          <button class="action delete" onclick="deletePrediction('${p.id || ''}')">Delete</button>
+        </div>` : '';
+      return `<div class="prediction-item" style="${deco}">
+        <div class="prediction-name">${escapeHtml(p.name)}</div>
+        <div style="color:#888">${escapeHtml(p.relationship)}</div>
+        <div>📅 ${dateFmt} &nbsp; 🕐 ${formatTime(p.time)}</div>
+        <div>⚖️ ${pounds} lbs ${ounces} oz &nbsp; 📏 ${Number(p.length).toFixed(2).replace(/\.00$/, '.0')} inches</div>
+        ${actions}
+      </div>`;
+    }
+    // expose helper for inline onclick
+    window.__edit = (pred)=>{ openEdit(pred); };
+
+    function formatTime(t){ const [h,m]=t.split(':').map(n=>parseInt(n,10)); const ampm=h>=12?'PM':'AM'; const hh=(h%12)||12; return `${hh}:${String(m).padStart(2,'0')} ${ampm}`; }
+    function overallScore(p){
+      const predDate=new Date(p.date+'T00:00:00'); const actDate=new Date(actualDetails.date+'T00:00:00');
+      const dDays=Math.abs((predDate-actDate)/86400000); const sDate=Math.max(0,100-(dDays/30)*100);
+      const [ph,pm]=p.time.split(':').map(Number), [ah,am]=actualDetails.time.split(':').map(Number);
+      const pMin=ph*60+pm, aMin=ah*60+am; const mDiff=Math.min(Math.abs(pMin-aMin),1440-Math.abs(pMin-aMin)); const sTime=Math.max(0,100-(mDiff/720)*100);
+      const sW=Math.max(0,100-(Math.abs(p.weight-actualDetails.weight)/32)*100);
+      const sL=Math.max(0,100-(Math.abs(p.length-actualDetails.length)/4)*100);
+      return (sDate+sTime+sW+sL)/4;
+    }
+    function sortByDate(arr){ return [...arr].sort((a,b)=>Math.abs(new Date(a.date)-new Date(actualDetails.date)) - Math.abs(new Date(b.date)-new Date(actualDetails.date))); }
+    function sortByTime(arr){ const [ah,am]=actualDetails.time.split(':').map(Number); const A=ah*60+am; return [...arr].sort((x,y)=>{
+      const xm=x.time.split(':').map(Number), ym=y.time.split(':').map(Number); const X=Math.min(Math.abs(xm[0]*60+xm[1]-A),1440-Math.abs(xm[0]*60+xm[1]-A)); const Y=Math.min(Math.abs(ym[0]*60+ym[1]-A),1440-Math.abs(ym[0]*60+ym[1]-A)); return X-Y;
+    }); }
+    function sortByWeight(arr){ return [...arr].sort((a,b)=>Math.abs(a.weight-actualDetails.weight)-Math.abs(b.weight-actualDetails.weight)); }
+    function sortByLength(arr){ return [...arr].sort((a,b)=>Math.abs(a.length-actualDetails.length)-Math.abs(b.length-actualDetails.length)); }
+
+    function calculateScores(){
+      const data={
+        date:document.getElementById('actualDate').value,
+        time:document.getElementById('actualTime').value,
+        weight:parseFloat(document.getElementById('actualWeight').value),
+        length:parseFloat(document.getElementById('actualLength').value)
+      };
+      if(!data.date||!data.time||Number.isNaN(data.weight)||Number.isNaN(data.length)) return alert('Please fill in all actual birth details!');
+      if (useCloud){ db.collection('gracie_meta').doc('actual').set(data); }
+      actualDetails=data; localStorage.setItem('graceActualDetails', JSON.stringify(actualDetails));
+      currentTab='overall'; displayPredictions(); alert('Winners calculated! Check the leaderboard! 🎉');
+    }
+
+    function escapeHtml(str){ return String(str).replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+    // Initial render
+    displayPredictions();
+  </script>
+</body>
+</html>
