@@ -37,7 +37,6 @@
     .tab-button{padding:8px 16px;border-radius:999px;border:2px solid var(--pink2);background:rgba(255,182,193,.3);color:var(--pink);font-weight:700;cursor:pointer}
     .tab-button.active{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff}
     .admin{display:none}
-    .admin-link{display:block;text-align:center;margin:8px 0 0;color:#c2185b;font-weight:700;cursor:pointer}
     /* Modal */
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:10}
     .modal{background:#fff;border-radius:14px;padding:20px;max-width:360px;width:92%;box-shadow:0 12px 30px rgba(0,0,0,.25)}
@@ -104,7 +103,7 @@
     <div class="card" id="boardContainer">
       <div style="text-align:center">
         <div style="font-size:1.6rem;background:linear-gradient(135deg,var(--pink),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🏖️ Prediction Board</div>
-        <div id="boardMode" style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-weight:700">Waiting for Gracie</div>
+        <div id="boardMode" class="board-mode" style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-weight:700">Waiting for Gracie</div>
       </div>
       <div class="leaderboard-tabs" id="leaderboardTabs">
         <button class="tab-button active" onclick="showTab('overall', this)">Overall</button>
@@ -183,23 +182,34 @@
     let currentTab = 'overall';
     let useCloud = false, db = null, isAdmin = false;
 
-    // 👉 To enable cloud sync for the shared link, paste your Firebase project config below.
-    // (Create a free project at console.firebase.google.com, enable Firestore in test mode.)
-const firebaseConfig = {
-  apiKey: "AIzaSyDI1QaggR3IOeqVmqFl-6nk2JOQx5nUr-Y",
-  authDomain: "gracie-lanier-predictions.firebaseapp.com",
-  projectId: "gracie-lanier-predictions",
-  storageBucket: "gracie-lanier-predictions.appspot.com",
-  messagingSenderId: "771175515936",
-  appId: "1:771175515936:web:8193be12c43fb9a7237945"
-};
+    // 👉 Firebase config (from your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDI1QaggR3IOeqVmqFl-6nk2JOQx5nUr-Y",
+      authDomain: "gracie-lanier-predictions.firebaseapp.com",
+      projectId: "gracie-lanier-predictions",
+      storageBucket: "gracie-lanier-predictions.appspot.com",
+      messagingSenderId: "771175515936",
+      appId: "1:771175515936:web:8193be12c43fb9a7237945"
+    };
 
+    // Load Firebase scripts safely in order, then init
     (function initFirebase(){
-      if (!firebaseConfig.apiKey) return; // stay in local mode
-      const s1=document.createElement('script');s1.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
-      const s2=document.createElement('script');s2.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js';
-      s2.onload=()=>{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); useCloud=true; attachCloudListeners(); };
-      document.head.appendChild(s1); document.head.appendChild(s2);
+      if (!firebaseConfig.apiKey) return; // local mode if not filled
+
+      const s1 = document.createElement('script');
+      s1.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+      s1.onload = () => {
+        const s2 = document.createElement('script');
+        s2.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js';
+        s2.onload = () => {
+          firebase.initializeApp(firebaseConfig);
+          db = firebase.firestore();
+          useCloud = true;
+          attachCloudListeners();
+        };
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s1);
     })();
 
     function attachCloudListeners(){
@@ -256,7 +266,7 @@ const firebaseConfig = {
     // Hidden triggers:
     // 1) Keyboard shortcut: Ctrl/Command + Shift + G
     document.addEventListener('keydown', (e)=>{
-      const isCtrl = e.ctrlKey || e.metaKey; // support Mac Command
+      const isCtrl = e.ctrlKey || e.metaKey;
       if (isCtrl && e.shiftKey && (e.key==='g' || e.key==='G')){ e.preventDefault(); openPin(); }
     });
     // 2) Triple-click the board title area
