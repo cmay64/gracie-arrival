@@ -105,7 +105,6 @@
       <div style="text-align:center">
         <div style="font-size:1.6rem;background:linear-gradient(135deg,var(--pink),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🏖️ Prediction Board</div>
         <div id="boardMode" style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:999px;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#fff;font-weight:700">Waiting for Gracie</div>
-        <div class="admin-link" id="openAdmin">🔐 Enter admin PIN</div>
       </div>
       <div class="leaderboard-tabs" id="leaderboardTabs">
         <button class="tab-button active" onclick="showTab('overall', this)">Overall</button>
@@ -186,15 +185,14 @@
 
     // 👉 To enable cloud sync for the shared link, paste your Firebase project config below.
     // (Create a free project at console.firebase.google.com, enable Firestore in test mode.)
-const firebaseConfig = {
-  apiKey: "AIzaSyDI1QaggR3IOeqVmqFl-6nk2JOQx5nUr-Y",
-  authDomain: "gracie-lanier-predictions.firebaseapp.com",
-  projectId: "gracie-lanier-predictions",
-  storageBucket: "gracie-lanier-predictions.appspot.com",
-  messagingSenderId: "771175515936",
-  appId: "1:771175515936:web:8193be12c43fb9a7237945"
-};
-
+    const firebaseConfig = {  // ← fill in to sync across all visitors
+      apiKey: "",
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+    };
 
     (function initFirebase(){
       if (!firebaseConfig.apiKey) return; // stay in local mode
@@ -247,14 +245,39 @@ const firebaseConfig = {
     });
     weightEl.dispatchEvent(new Event('input')); lengthEl.dispatchEvent(new Event('input'));
 
-    // -------- Admin PIN modal --------
+    // -------- Admin PIN modal (hidden triggers) --------
     const ADMIN_PIN = 'gracie2025'; // change to any secret you like
     const pinModal = document.getElementById('pinModal');
-    document.getElementById('openAdmin').addEventListener('click', ()=>{ pinModal.style.display='flex'; setTimeout(()=>document.getElementById('pinInput').focus(), 50); });
-    document.getElementById('pinCancel').addEventListener('click', ()=>{ pinModal.style.display='none'; });
+    const boardTitleEl = document.querySelector('#boardContainer .board-mode')?.previousElementSibling; // the big title above mode chip
+
+    function openPin(){ pinModal.style.display='flex'; setTimeout(()=>document.getElementById('pinInput').focus(),50); }
+    function closePin(){ pinModal.style.display='none'; }
+
+    // Hidden triggers:
+    // 1) Keyboard shortcut: Ctrl/Command + Shift + G
+    document.addEventListener('keydown', (e)=>{
+      const isCtrl = e.ctrlKey || e.metaKey; // support Mac Command
+      if (isCtrl && e.shiftKey && (e.key==='g' || e.key==='G')){ e.preventDefault(); openPin(); }
+    });
+    // 2) Triple-click the board title area
+    if (boardTitleEl){
+      let clicks = 0, last = 0;
+      boardTitleEl.addEventListener('click', ()=>{
+        const now = Date.now();
+        clicks = (now - last < 800) ? clicks + 1 : 1; // 3 clicks within 800ms
+        last = now;
+        if (clicks >= 3){ clicks = 0; openPin(); }
+      });
+    }
+    // 3) URL helpers: #admin opens modal; ?adminpin=PIN auto-unlocks
+    if (location.hash === '#admin') openPin();
+    const autoPin = new URLSearchParams(location.search).get('adminpin');
+    if (autoPin && autoPin === ADMIN_PIN){ isAdmin = true; document.getElementById('adminSection').style.display='block'; displayPredictions(); }
+
+    document.getElementById('pinCancel').addEventListener('click', closePin);
     document.getElementById('pinSubmit').addEventListener('click', ()=>{
       const pin = document.getElementById('pinInput').value.trim();
-      if (pin === ADMIN_PIN){ isAdmin = true; document.getElementById('adminSection').style.display='block'; pinModal.style.display='none'; displayPredictions(); }
+      if (pin === ADMIN_PIN){ isAdmin = true; document.getElementById('adminSection').style.display='block'; closePin(); displayPredictions(); }
       else { const msg=document.getElementById('pinMsg'); msg.style.display='block'; setTimeout(()=>msg.style.display='none',1500); }
     });
 
